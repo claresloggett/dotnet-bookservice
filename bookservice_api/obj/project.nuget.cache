@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "dVmSmTTJaC7n9dwKTwi4VKNKhbIiEHADinElLFQBou4V4yfjd/OYJOmK3vq188QD8xv+31vuimNTqPllFbHp/g==",
+  "dgSpecHash": "ebKBSwWkmQru4FIlbgIPNbyYNeyLSMoQpWeYOHXvj3SCWi3uCJbZtHgSFAo3YtUNYb2D1d+mbhgGng9p6i4QCg==",
   "success": true,
   "projectFilePath": "/home/clare/mdu_working_local/dev/dotnet_bookservice/bookservice_api/bookservice_api.csproj",
   "expectedPackageFiles": [
