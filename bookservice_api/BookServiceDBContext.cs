@@ -1,3 +1,4 @@
+using bookservice_api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DefaultNamespace;
@@ -8,5 +9,5 @@ public class BookServiceDBContext : DbContext
     {
     }
     
-    
+    public DbSet<Author> Authors { get; set; }
 }
