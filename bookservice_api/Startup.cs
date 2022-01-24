@@ -29,7 +29,8 @@ namespace bookservice_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<BookServiceDBContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("LocalBookServiceDB"),
+                options.UseLazyLoadingProxies()
+                    .UseSqlServer(Configuration.GetConnectionString("LocalBookServiceDB"),
                     sqlOptions => sqlOptions
                         .CommandTimeout(1800)
                         .EnableRetryOnFailure()

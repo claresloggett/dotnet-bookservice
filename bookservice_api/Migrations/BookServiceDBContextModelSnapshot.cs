@@ -35,7 +35,7 @@ namespace bookservice_api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Authors");
+                    b.ToTable("Authors", (string)null);
                 });
 
             modelBuilder.Entity("bookservice_api.Models.Book", b =>
@@ -66,7 +66,7 @@ namespace bookservice_api.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("Books");
+                    b.ToTable("Books", (string)null);
                 });
 
             modelBuilder.Entity("bookservice_api.Models.Book", b =>

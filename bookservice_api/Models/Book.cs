@@ -14,5 +14,6 @@ public class Book
     // Foreign Key
     public int AuthorId { get; set; }
     // Navigation property
-    public Author Author { get; set; }
+    // With UseLazyLoadingProxies this MUST be virtual, or errors out (i.e. laziness cannot be piecemeal?)
+    public virtual Author Author { get; set; }
 }
