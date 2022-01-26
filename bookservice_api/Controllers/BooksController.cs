@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using bookservice_api.DTOs;
 using bookservice_api.Models;
 using DefaultNamespace;
@@ -15,24 +16,19 @@ namespace bookservice_api.Controllers;
 public class BooksController : Controller
 {
     private BookServiceDBContext _context;
-
-    public BooksController(BookServiceDBContext context)
+    private IMapper _mapper;
+    
+    public BooksController(BookServiceDBContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
     
     [HttpGet]
     public ActionResult<IEnumerable<Book>> GetBooks()
     {
         IQueryable<Book> books = _context.Books;
-        IQueryable<BookDTO> dtos = from b in books
-            select new BookDTO()
-            {
-                Id = b.Id,
-                Title = b.Title,
-                AuthorName = b.Author.Name
-            };
-        //.Include(b => b.Author);
+        IQueryable<BookDTO> dtos = _mapper.ProjectTo<BookDTO>(books);
         return Ok(dtos);
     }
     

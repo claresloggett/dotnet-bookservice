@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using DefaultNamespace;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using AutoMapper;
 
 namespace bookservice_api
 {
@@ -36,6 +38,12 @@ namespace bookservice_api
                         .EnableRetryOnFailure()
                 )
             );
+            MapperConfiguration autoMapper = new MapperConfiguration(cfg =>
+            {
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                cfg.AddMaps(assembly);
+            });
+            services.AddScoped(provider => autoMapper.CreateMapper());
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
