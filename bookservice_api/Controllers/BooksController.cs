@@ -1,5 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using bookservice_api.DTOs;
 using bookservice_api.Models;
 using DefaultNamespace;
 using Microsoft.AspNetCore.Mvc;
@@ -21,8 +24,16 @@ public class BooksController : Controller
     [HttpGet]
     public ActionResult<IEnumerable<Book>> GetBooks()
     {
-        IEnumerable<Book> books = _context.Books;   //.Include(b => b.Author);
-        return Ok(books);
+        IQueryable<Book> books = _context.Books;
+        IQueryable<BookDTO> dtos = from b in books
+            select new BookDTO()
+            {
+                Id = b.Id,
+                Title = b.Title,
+                AuthorName = b.Author.Name
+            };
+        //.Include(b => b.Author);
+        return Ok(dtos);
     }
     
     [HttpGet("{id}")]
