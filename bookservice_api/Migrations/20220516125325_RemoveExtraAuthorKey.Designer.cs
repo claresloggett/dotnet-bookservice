@@ -4,6 +4,7 @@ using DefaultNamespace;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace bookservice_api.Migrations
 {
     [DbContext(typeof(BookServiceDBContext))]
-    partial class BookServiceDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220516125325_RemoveExtraAuthorKey")]
+    partial class RemoveExtraAuthorKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +23,6 @@ namespace bookservice_api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("BookGenre", b =>
-                {
-                    b.Property<int>("BooksId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GenresId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BooksId", "GenresId");
-
-                    b.HasIndex("GenresId");
-
-                    b.ToTable("BookGenre");
-                });
 
             modelBuilder.Entity("bookservice_api.Models.Author", b =>
                 {
@@ -65,6 +52,9 @@ namespace bookservice_api.Migrations
                     b.Property<int?>("AuthorId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Genre")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
@@ -80,37 +70,6 @@ namespace bookservice_api.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("Books");
-                });
-
-            modelBuilder.Entity("bookservice_api.Models.Genre", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Genres");
-                });
-
-            modelBuilder.Entity("BookGenre", b =>
-                {
-                    b.HasOne("bookservice_api.Models.Book", null)
-                        .WithMany()
-                        .HasForeignKey("BooksId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("bookservice_api.Models.Genre", null)
-                        .WithMany()
-                        .HasForeignKey("GenresId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("bookservice_api.Models.Book", b =>
