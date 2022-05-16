@@ -1,3 +1,4 @@
+using System.Linq;
 using AutoMapper;
 using bookservice_api.Models;
 using bookservice_api.DTOs;
@@ -11,6 +12,9 @@ public class BookProfile : Profile
         CreateMap<Book, BookDTO>()
             .ForMember(
                 dest => dest.AuthorName,
-                opt => opt.MapFrom(src => src.Author.Name));
+                opt => opt.MapFrom(src => src.Author.Name))
+            .ForMember(
+                dest => dest.Genres,
+                opt => opt.MapFrom(src => src.Genres.Select(g => g.Name)));
     }
 }
