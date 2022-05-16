@@ -33,16 +33,30 @@ public class BooksController : Controller
     }
     
     [HttpGet("{id}")]
-         public async Task<ActionResult<Book>> GetBook(int id)
+     public async Task<ActionResult<BookDTO>> GetBook(int id)
+     {
+         Book book = await _context.Books.FindAsync(id);
+         if (book == null)
          {
-             Book book = await _context.Books.FindAsync(id);
-             if (book == null)
-             {
-                 return NotFound();
-             }
-        
-             return Ok(book);
+             return NotFound();
          }
+    
+         // Does this optimise query? It's not applied to queryable
+         // No, looks like it doesn't
+         return Ok(_mapper.Map<BookDTO>(book));
+     }
+     
+     [HttpGet("title/{titleString}")]
+     public async Task<ActionResult<IEnumerable<BookDTO>>> GetBooksByTitle(string titleString)
+     {
+         IEnumerable<BookDTO> books = await _context.Books
+             .Where(b => b.Title.Contains(titleString))
+             .Include(b => b.Author)         // Looks like Include() is needed for join, even with projection
+             .Select(b => _mapper.Map<BookDTO>(b))
+             .ToListAsync();
+
+         return Ok(books);
+     }
 
      [HttpPost]
      public async Task<IActionResult> PostBook(Book book)

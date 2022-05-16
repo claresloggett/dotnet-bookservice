@@ -1,5 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using bookservice_api.DTOs;
 using bookservice_api.Models;
 using DefaultNamespace;
 using Microsoft.AspNetCore.Mvc;
@@ -12,28 +16,32 @@ namespace bookservice_api.Controllers;
 public class AuthorsController : Controller
 {
     private BookServiceDBContext _context;
+    private IMapper _mapper;
 
-    public AuthorsController(BookServiceDBContext context)
+    public AuthorsController(BookServiceDBContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
     
     [HttpGet]
-    public ActionResult<IEnumerable<Author>> GetAuthors()
+    public ActionResult<IEnumerable<AuthorDTO>> GetAuthors()
     {
-        IEnumerable<Author> authors = _context.Authors;
+        IEnumerable<AuthorDTO> authors = _context.Authors
+            .Select(a => _mapper.Map<AuthorDTO>(a))
+            .ToList();
         return Ok(authors);
     }
 
     [HttpGet("{id}")]
-     public async Task<ActionResult<Author>> GetAuthor(int id)
+     public async Task<ActionResult<AuthorDTO>> GetAuthor(int id)
      {
-         Author author = await _context.Authors.FindAsync(id);
+         AuthorDTO author = _mapper.Map<AuthorDTO>(await _context.Authors.FindAsync(id));
          if (author == null)
          {
              return NotFound();
          }
-    
+         
          return Ok(author);
      }
 
