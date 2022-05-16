@@ -47,12 +47,17 @@ public class AuthorsController : Controller
      }
 
      [HttpPost]
-     public async Task<IActionResult> PostAuthor(Author author)
+     public async Task<IActionResult> PostAuthor(AuthorPostDTO dto)
      {
          if (!ModelState.IsValid)
          {
              return BadRequest(ModelState);
          }
+
+         var author = new Author()
+         {
+             Name = dto.Name
+         };
          
          _context.Authors.Add(author);
          await _context.SaveChangesAsync();
@@ -62,19 +67,23 @@ public class AuthorsController : Controller
      }
      
      [HttpPut("{id}")]
-     public async Task<IActionResult> PutAuthor(int id, Author author)
+     public async Task<IActionResult> PutAuthor(int id, AuthorPostDTO dto)
      {
          if (!ModelState.IsValid)
          {
              return BadRequest(ModelState);
          }
 
-         if (id != author.Id)
+         Author author = await _context.Authors.FindAsync(id);
+         if (author == null)
          {
-             return BadRequest();
+             return NotFound();
          }
 
-         _context.Entry(author).State = EntityState.Modified;
+         author.Name = dto.Name;
+         
+         // needed?
+         //_context.Entry(author).State = EntityState.Modified;
 
          // NB have left out DbUpdateConcurrencyException catching here
          await _context.SaveChangesAsync();
