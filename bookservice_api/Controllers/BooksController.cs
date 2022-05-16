@@ -25,7 +25,7 @@ public class BooksController : Controller
     }
     
     [HttpGet]
-    public ActionResult<IEnumerable<Book>> GetBooks()
+    public ActionResult<IEnumerable<BookDTO>> GetBooks()
     {
         IQueryable<Book> books = _context.Books;
         IQueryable<BookDTO> dtos = _mapper.ProjectTo<BookDTO>(books);
