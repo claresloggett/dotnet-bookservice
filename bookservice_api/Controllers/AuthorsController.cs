@@ -36,6 +36,7 @@ public class AuthorsController : Controller
     [HttpGet("{id}")]
      public async Task<ActionResult<AuthorDTO>> GetAuthor(int id)
      {
+         // Since this DTO draws on no other tables, FindAsync(id) is ok, but otherwise it seems like a bad idea
          AuthorDTO author = _mapper.Map<AuthorDTO>(await _context.Authors.FindAsync(id));
          if (author == null)
          {

@@ -35,15 +35,19 @@ public class BooksController : Controller
     [HttpGet("{id}")]
      public async Task<ActionResult<BookDTO>> GetBook(int id)
      {
-         Book book = await _context.Books.FindAsync(id);
+         // Include, ProjectTo and then SingleOrDefaultAsync() does optimise query
+         
+         IQueryable<BookDTO> bookQuery = _mapper.ProjectTo<BookDTO>(_context.Books
+             .Include(b => b.Author));
+             
+         BookDTO book = await bookQuery.SingleOrDefaultAsync(b => b.Id == id);
+
          if (book == null)
          {
              return NotFound();
          }
-    
-         // Does this optimise query? It's not applied to queryable
-         // No, looks like it doesn't
-         return Ok(_mapper.Map<BookDTO>(book));
+         
+         return Ok(book);
      }
      
      [HttpGet("title/{titleString}")]
