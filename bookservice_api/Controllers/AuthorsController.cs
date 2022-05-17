@@ -34,76 +34,76 @@ public class AuthorsController : Controller
     }
 
     [HttpGet("{id}")]
-     public async Task<ActionResult<AuthorDTO>> GetAuthor(int id)
-     {
-         // Since this DTO draws on no other tables, FindAsync(id) is ok, but otherwise it seems like a bad idea
-         AuthorDTO author = _mapper.Map<AuthorDTO>(await _context.Authors.FindAsync(id));
-         if (author == null)
-         {
-             return NotFound();
-         }
+    public async Task<ActionResult<AuthorDTO>> GetAuthor(int id)
+    {
+        // Since this DTO draws on no other tables, FindAsync(id) is ok, but otherwise it seems like a bad idea
+        AuthorDTO author = _mapper.Map<AuthorDTO>(await _context.Authors.FindAsync(id));
+        if (author == null)
+        { 
+            return NotFound();
+        }
          
-         return Ok(author);
-     }
+        return Ok(author);
+    }
 
-     [HttpPost]
-     public async Task<IActionResult> PostAuthor(AuthorPostDTO dto)
-     {
-         if (!ModelState.IsValid)
-         {
-             return BadRequest(ModelState);
-         }
+    [HttpPost]
+    public async Task<IActionResult> PostAuthor(AuthorPostDTO dto)
+    {
+        if (!ModelState.IsValid)
+        { 
+            return BadRequest(ModelState);
+        }
 
-         var author = new Author()
-         {
-             Name = dto.Name
-         };
+        var author = new Author()
+        {
+            Name = dto.Name
+        };
          
-         _context.Authors.Add(author);
-         await _context.SaveChangesAsync();
+        _context.Authors.Add(author);
+        await _context.SaveChangesAsync();
 
-         // Tutorial used CreatedAtRoute. Here, could also just use "GetAuthor"
-         return CreatedAtAction(nameof(GetAuthor), new { id = author.Id }, author);
-     }
+        // Tutorial used CreatedAtRoute. Here, could also just use "GetAuthor"
+        return CreatedAtAction(nameof(GetAuthor), new { id = author.Id }, author);
+    }
      
-     [HttpPut("{id}")]
-     public async Task<IActionResult> PutAuthor(int id, AuthorPostDTO dto)
-     {
-         if (!ModelState.IsValid)
-         {
-             return BadRequest(ModelState);
-         }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutAuthor(int id, AuthorPostDTO dto)
+    { 
+        if (!ModelState.IsValid)
+        { 
+            return BadRequest(ModelState);
+        }
 
-         Author author = await _context.Authors.FindAsync(id);
-         if (author == null)
-         {
-             return NotFound();
-         }
+        Author author = await _context.Authors.FindAsync(id);
+        if (author == null)
+        {
+            return NotFound();
+        }
 
-         author.Name = dto.Name;
+        author.Name = dto.Name;
          
-         // needed?
-         //_context.Entry(author).State = EntityState.Modified;
+        // needed?
+        //_context.Entry(author).State = EntityState.Modified;
 
-         // NB have left out DbUpdateConcurrencyException catching here
-         await _context.SaveChangesAsync();
+        // NB have left out DbUpdateConcurrencyException catching here
+        await _context.SaveChangesAsync();
          
-         return NoContent();
-     }
+        return NoContent();
+    }
      
-     [HttpDelete("{id}")]
-     public async Task<IActionResult> DeleteAuthor(int id)
-     {
-         Author author = await _context.Authors.FindAsync(id);
-         if (author == null)
-         {
-             return NotFound();
-         }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAuthor(int id)
+    {
+        Author author = await _context.Authors.FindAsync(id);
+        if (author == null)
+        {
+            return NotFound();
+        }
 
-         _context.Authors.Remove(author);
-         await _context.SaveChangesAsync();
+        _context.Authors.Remove(author);
+        await _context.SaveChangesAsync();
 
-         return Ok(author);
-     }
+        return Ok(author);
+    }
      
 }

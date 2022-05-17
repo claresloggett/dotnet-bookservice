@@ -33,83 +33,83 @@ public class BooksController : Controller
     }
     
     [HttpGet("{id}")]
-     public async Task<ActionResult<BookDTO>> GetBook(int id)
-     {
-         // Include, ProjectTo and then SingleOrDefaultAsync() does optimise query
+    public async Task<ActionResult<BookDTO>> GetBook(int id)
+    {
+        // Include, ProjectTo and then SingleOrDefaultAsync() does optimise query
          
-         IQueryable<BookDTO> bookQuery = _mapper.ProjectTo<BookDTO>(_context.Books
-             .Include(b => b.Author));
+        IQueryable<BookDTO> bookQuery = _mapper.ProjectTo<BookDTO>(_context.Books
+            .Include(b => b.Author));
              
-         BookDTO book = await bookQuery.SingleOrDefaultAsync(b => b.Id == id);
+        BookDTO book = await bookQuery.SingleOrDefaultAsync(b => b.Id == id);
 
-         if (book == null)
-         {
-             return NotFound();
-         }
+        if (book == null)
+        {
+            return NotFound();
+        }
          
-         return Ok(book);
-     }
+        return Ok(book);
+    }
      
-     [HttpGet("title/{titleString}")]
-     public async Task<ActionResult<IEnumerable<BookDTO>>> GetBooksByTitle(string titleString)
-     {
-         IEnumerable<BookDTO> books = await _context.Books
-             .Where(b => b.Title.Contains(titleString))
-             .Include(b => b.Author)         // Looks like Include() is needed for join, even with projection
-             .Select(b => _mapper.Map<BookDTO>(b))
-             .ToListAsync();
+    [HttpGet("title/{titleString}")]
+    public async Task<ActionResult<IEnumerable<BookDTO>>> GetBooksByTitle(string titleString)
+    {
+        IEnumerable<BookDTO> books = await _context.Books
+            .Where(b => b.Title.Contains(titleString))
+            .Include(b => b.Author)         // Looks like Include() is needed for join, even with projection
+            .Select(b => _mapper.Map<BookDTO>(b))
+            .ToListAsync();
 
-         return Ok(books);
-     }
+        return Ok(books);
+    }
 
-     [HttpPost]
-     public async Task<IActionResult> PostBook(Book book)
-     {
-         if (!ModelState.IsValid)
-         {
-             return BadRequest(ModelState);
-         }
+    [HttpPost]
+    public async Task<IActionResult> PostBook(Book book)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
          
-         _context.Books.Add(book);
-         await _context.SaveChangesAsync();
+        _context.Books.Add(book);
+        await _context.SaveChangesAsync();
 
-         // Tutorial used CreatedAtRoute. Here, could also just use "GetBook"
-         return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
-     }
+        // Tutorial used CreatedAtRoute. Here, could also just use "GetBook"
+        return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
+    }
      
-     [HttpPut("{id}")]
-     public async Task<IActionResult> PutBook(int id, Book book)
-     {
-         if (!ModelState.IsValid)
-         {
-             return BadRequest(ModelState);
-         }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutBook(int id, Book book)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
 
-         if (id != book.Id)
-         {
-             return BadRequest();
-         }
+        if (id != book.Id)
+        {
+            return BadRequest();
+        }
 
-         _context.Entry(book).State = EntityState.Modified;
+        _context.Entry(book).State = EntityState.Modified;
 
-         // NB have left out DbUpdateConcurrencyException catching here
-         await _context.SaveChangesAsync();
+        // NB have left out DbUpdateConcurrencyException catching here
+        await _context.SaveChangesAsync();
          
-         return NoContent();
-     }
+        return NoContent();
+    }
      
-     [HttpDelete("{id}")]
-     public async Task<IActionResult> DeleteBook(int id)
-     {
-         Book book = await _context.Books.FindAsync(id);
-         if (book == null)
-         {
-             return NotFound();
-         }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteBook(int id)
+    {
+        Book book = await _context.Books.FindAsync(id);
+        if (book == null)
+        {
+            return NotFound();
+        }
 
-         _context.Books.Remove(book);
-         await _context.SaveChangesAsync();
+        _context.Books.Remove(book);
+        await _context.SaveChangesAsync();
 
-         return Ok(book);
-     }
+        return Ok(book);
+    }
 }
