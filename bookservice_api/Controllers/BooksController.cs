@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,38 +64,84 @@ public class BooksController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostBook(Book book)
+    public async Task<IActionResult> PostBook(BookPostDTO dto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-         
+
+        Author author = await _context.Authors
+            .Where(a => a.Name == dto.AuthorName)
+            .SingleOrDefaultAsync();
+
+        if (author == null)
+        {
+            return NotFound($"Author {dto.AuthorName} not found");
+        }
+            
+        var (missingGenres, genreList) = FindGenres(dto);
+
+        if (missingGenres.Any())
+        {
+            string missingGenreString = String.Join(",", missingGenres);
+            return NotFound($"Books not found in system: {missingGenreString}");
+        }
+        
+        var book = new Book()
+        {
+            Title = dto.Title,
+            Year = dto.Year,
+            Price = dto.Price,
+            Author = author,
+            Genres = genreList
+        };
+
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
 
         // Tutorial used CreatedAtRoute. Here, could also just use "GetBook"
-        return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
+        return CreatedAtAction(nameof(GetBook), new { id = book.Id }, _mapper.Map<BookDTO>(book));
     }
      
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutBook(int id, Book book)
+    public async Task<IActionResult> PutBook(int id, BookPostDTO dto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        if (id != book.Id)
+        Book book = await _context.Books.FindAsync(id);
+        if (book == null)
         {
-            return BadRequest();
+            return NotFound("Book id not found");
+        }
+        
+        Author author = await _context.Authors
+            .Where(a => a.Name == dto.AuthorName)
+            .SingleOrDefaultAsync();
+        if (author == null)
+        {
+            return NotFound($"Author {dto.AuthorName} not found");
+        }
+            
+        var (missingGenres, genreList) = FindGenres(dto);
+        if (missingGenres.Any())
+        {
+            string missingGenreString = String.Join(",", missingGenres);
+            return NotFound($"Books not found in system: {missingGenreString}");
         }
 
-        _context.Entry(book).State = EntityState.Modified;
+        book.Title = dto.Title;
+        book.Price = dto.Price;
+        book.Year = dto.Year;
+        book.Author = author;
+        book.Genres = genreList;
 
         // NB have left out DbUpdateConcurrencyException catching here
         await _context.SaveChangesAsync();
-         
+        
         return NoContent();
     }
      
@@ -111,5 +158,20 @@ public class BooksController : Controller
         await _context.SaveChangesAsync();
 
         return Ok(book);
+    }
+    
+    // Returns missingBookTitles, foundBooks
+    // Note this (,) notation uses ValueTuple, newer than Tuple<>; would need .ToTuple() to convert
+    private (IEnumerable<string>, List<Genre>) FindGenres(BookPostDTO dto)
+    {
+        // Is ToUpper() more DB-safe than ToLower() ?
+        List<string> uppercaseTitles = dto.GenreNames.Select(t => t.ToUpper()).ToList();
+        List<Genre> genreList = _context.Genres
+            .Where(b => uppercaseTitles.Any(title => b.Name.ToUpper()==title))
+            .ToList();
+
+        var missingBooks = dto.GenreNames.Except(genreList.Select(g => g.Name), StringComparer.OrdinalIgnoreCase);
+        
+        return (missingBooks, genreList);
     }
 }

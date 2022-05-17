@@ -63,7 +63,7 @@ public class AuthorsController : Controller
         await _context.SaveChangesAsync();
 
         // Tutorial used CreatedAtRoute. Here, could also just use "GetAuthor"
-        return CreatedAtAction(nameof(GetAuthor), new { id = author.Id }, author);
+        return CreatedAtAction(nameof(GetAuthor), new { id = author.Id }, _mapper.Map<AuthorDTO>(author));
     }
      
     [HttpPut("{id}")]
