@@ -28,7 +28,10 @@ public class BooksController : Controller
     [HttpGet]
     public ActionResult<IEnumerable<BookDTO>> GetBooks()
     {
-        IQueryable<Book> books = _context.Books;
+        // Try raw SQL
+        IQueryable<Book> books = _context.Books.FromSqlRaw("SELECT * FROM dbo.Books");
+        //IQueryable<Book> books = _context.Books;
+        
         IQueryable<BookDTO> dtos = _mapper.ProjectTo<BookDTO>(books);
         return Ok(dtos);
     }
@@ -37,7 +40,7 @@ public class BooksController : Controller
     public async Task<ActionResult<BookDTO>> GetBook(int id)
     {
         // Include, ProjectTo and then SingleOrDefaultAsync() does optimise query
-         
+
         IQueryable<BookDTO> bookQuery = _mapper.ProjectTo<BookDTO>(_context.Books
             .Include(b => b.Author));
              
