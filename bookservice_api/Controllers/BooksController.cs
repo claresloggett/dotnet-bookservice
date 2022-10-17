@@ -88,7 +88,7 @@ public class BooksController : Controller
         if (missingGenres.Any())
         {
             string missingGenreString = String.Join(",", missingGenres);
-            return NotFound($"Books not found in system: {missingGenreString}");
+            return NotFound($"Genres not found in system: {missingGenreString}");
         }
         
         var book = new Book()
@@ -133,7 +133,7 @@ public class BooksController : Controller
         if (missingGenres.Any())
         {
             string missingGenreString = String.Join(",", missingGenres);
-            return NotFound($"Books not found in system: {missingGenreString}");
+            return NotFound($"Genres not found in system: {missingGenreString}");
         }
 
         book.Title = dto.Title;
