@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,14 +50,34 @@ public class AuthorsController : Controller
     [HttpPost]
     public async Task<IActionResult> PostAuthor(AuthorPostDTO dto)
     {
+        // As an experiment, this endpoint breaks the pattern by creating the Country if
+        // it does not exist
+        
         if (!ModelState.IsValid)
         { 
             return BadRequest(ModelState);
         }
 
+        var country = await _context.Countries
+            .SingleOrDefaultAsync(c => c.Name == dto.CountryName);
+
+        if (country == null)
+        {
+            Console.WriteLine($"Country {dto.CountryName} not found; PostAuthor creating Country");
+            country = new Country()
+            {
+                Name = dto.CountryName
+            };
+            _context.Countries.Add(country);
+            //TODO: Really ought to use a transaction to make sure this does not 
+            //succeed while the second save fails
+            await _context.SaveChangesAsync();
+        }
+        
         var author = new Author()
         {
-            Name = dto.Name
+            Name = dto.Name,
+            Country = country
         };
          
         _context.Authors.Add(author);
