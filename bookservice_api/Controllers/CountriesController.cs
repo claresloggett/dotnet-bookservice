@@ -58,9 +58,9 @@ public class CountriesController : Controller
             return NotFound($"Book with id {bookId} not found");
         }
         
+        // Note that Include statements for Author and Country are unnecessary here
+        // as the projection via Select causes left joins
         Country country = _context.Books
-            .Include(b => b.Author)
-            .ThenInclude(a => a.Country)
             .Where(b => b.Id == bookId)
             .Select(b => b.Author.Country)
             .SingleOrDefault();
