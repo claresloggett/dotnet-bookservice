@@ -73,5 +73,26 @@ public class CountriesController : Controller
         CountryDTO countryDto = _mapper.Map<CountryDTO>(country);
         return Ok(countryDto);
     }
+    
+    [HttpGet("byBookWithIncludes/{bookId}")]
+    public ActionResult<IEnumerable<CountryDTO>> GetCountryByBookWithIncludes(int bookId)
+    {
+        // Get Country via Book -> Author -> Country to test query behaviour
+        
+        // This performs only one database query with joined entities,
+        // but unnecessarily gets all fields from entities Book, Author, Country
+        Book book = _context.Books
+            .Include(b => b.Author)
+            .ThenInclude(a => a.Country)
+            .SingleOrDefault(b => b.Id == bookId);
+
+        if (book == null)
+        {
+            return NotFound();
+        }
+        
+        CountryDTO countryDto = _mapper.Map<CountryDTO>(book.Author.Country);
+        return Ok(countryDto);
+    }
 }
 
